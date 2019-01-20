@@ -1,10 +1,43 @@
-var createError = require("http-errors")
 var express = require("express")
 var path = require("path")
-var cookieParser = require("cookie-parser")
+var favicon = require("serve-favicon")
 var logger = require("morgan")
+var cookieParser = require("cookie-parser")
+var bodyParser = require("body-parser")
+var mongoose = require("mongoose")
 
 var app = express()
+
+var User = require("./models/User")
+
+//connect to mongodb locally
+// create a new John Doe with each cranking up of application
+mongoose
+  .connect(
+    "mongodb://localhost:27017/express_app",
+    function() {
+      console.log("Connection has been made")
+      const user_resource = new User({
+        name: "John Doe",
+        email: "john@doe.com"
+      })
+      // error handler
+      app.use(function(err, req, res, next) {
+        user_resource.save(error => {
+          if (error) console.log(error)
+          res.send({
+            success: true,
+            code: 200,
+            msg: "User added!"
+          })
+        })
+      })
+    }
+  )
+  .catch(err => {
+    console.error("App starting error:", err.stack)
+    process.exit(1)
+  })
 
 // Require file system module
 var fs = require("file-system")
