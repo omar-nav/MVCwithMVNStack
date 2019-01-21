@@ -1,17 +1,20 @@
 var express = require("express")
 var path = require("path")
 var favicon = require("serve-favicon")
-var logger = require("morgan")
 var cookieParser = require("cookie-parser")
 var bodyParser = require("body-parser")
 var mongoose = require("mongoose")
 
 var app = express()
-
 // var User = require("./models/User")
 
 //connect to mongodb locally
 // create a new John Doe with each cranking up of application
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+
+//connect to mongodb
 mongoose
   .connect(
     "mongodb://localhost:27017/express_app",
@@ -54,15 +57,16 @@ fs.readdirSync("controllers").forEach(function(file) {
 app.set("views", path.join(__dirname, "views"))
 app.set("view engine", "pug")
 
-app.use(logger("dev"))
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "public")))
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404))
+  var err = new Error("Not Found")
+  err.status = 404
+  next(err)
 })
 
 // error handler
